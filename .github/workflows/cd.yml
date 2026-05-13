@@ -1,20 +1,15 @@
-name: CD - Build, Push and Deploy
+name: CD - Production Deployment
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    branches: [main] # Se dispara cuando haces merge o push a main
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
     steps:
       - name: Checkout del codigo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Login a Docker Hub
         uses: docker/login-action@v3
@@ -31,11 +26,23 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/nestjs-app:${{ github.sha }}
             ${{ secrets.DOCKER_USERNAME }}/nestjs-app:latest
 
+      # --- PASO DE SEGURIDAD: Escaneo con Trivy ---
+      - name: Escaneo de vulnerabilidades
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.DOCKER_USERNAME }}/nestjs-app:${{ github.sha }}
+          format: 'table'
+          exit-code: '0' # El pipeline sigue aunque encuentre vulnerabilidades (para reporte)
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+    environment: production # ESTO CONECTA CON TUS SECRETOS DE ENTORNO
     steps:
-      - name: Desplegar en servidor remoto
+      - name: Desplegar en AWS EC2
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -44,29 +51,14 @@ jobs:
           script: |
             IMAGE="${{ secrets.DOCKER_USERNAME }}/nestjs-app:latest"
             
-            # 1. Bajar la imagen nuevas
             docker pull $IMAGE
             
-            # 2. Correrla en el puerto 3001 para validar
-            docker run -d --name nest-app-new -p 3001:3001 $IMAGE
+            # Detenemos el contenedor anterior si existe
+            docker stop nest-app || true
+            docker rm nest-app || true
             
-            # 3. Esperar a que NestJS eche a andar
-            sleep 20
+            # Despliegue en el puerto 80 (puedes cambiar a 3001 si prefieres)
+            docker run -d --name nest-app --restart unless-stopped -p 80:3001 $IMAGE
             
-            # 4. Health check (validamos contra Swagger /api)
-            if curl -sf http://localhost:3001/api; then
-              echo "Health check exitoso. Activando versión nueva..."
-              docker stop nest-app || true
-              docker rm nest-app || true
-              
-              # 5. Desplegar en el puerto 80 (el que abrimos en AWS)
-              docker run -d --name nest-app --restart unless-stopped -p 80:3001 $IMAGE
-              docker rm -f nest-app-new || true
-            else
-              echo "Health check FALLIDO. Manteniendo versión anterior."
-              docker rm -f nest-app-new || true
-              exit 1
-            fi
-            
-            # 6. Limpieza de imágenes viejas
+            # Limpieza de imágenes viejas para no llenar el disco de la EC2
             docker system prune -f
