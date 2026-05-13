@@ -16,6 +16,6 @@ RUN npm ci --only=production
 # Copiamos la carpeta dist compilada
 COPY --from=builder /app/dist ./dist
 
-EXPOSE 3000
+EXPOSE 3001
 # En NestJS el punto de entrada suele ser dist/main
 CMD ["node", "dist/main"]
