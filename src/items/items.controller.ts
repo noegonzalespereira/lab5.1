@@ -20,11 +20,10 @@ export class ItemsController {
   findAll() {
     return this.itemsService.findAll();
   }
-  // Ponlo ANTES del @Get(':id')
   @Get('health')
   @ApiOperation({ summary: 'Estado del servicio' })
   getHealth() {
-    return { status: 'ok' };
+    return { status: 'ok',version: '1.0'};
   }
 
   @Get(':id')
