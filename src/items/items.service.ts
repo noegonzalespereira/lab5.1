@@ -37,7 +37,7 @@ export class ItemsService {
 
   remove(id: number) {
     const itemIndex = this.items.findIndex((item) => item.id === id);
-    if (itemIndex === -1) throw new NotFoundException(`Item con id ${id} no encontrado`);
+    if (itemIndex === -1) throw new NotFoundException(`Item  no encontrado`);
     
     this.items.splice(itemIndex, 1);
     return { deleted: true };
