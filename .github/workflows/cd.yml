@@ -54,7 +54,7 @@ jobs:
             sleep 20
             
             # 4. Health check (validamos contra Swagger /api)
-            if curl -sf http://localhost:3001/items/health; then
+            if curl -sf http://localhost:3001/api; then
               echo "Health check exitoso. Activando versión nueva..."
               docker stop nest-app || true
               docker rm nest-app || true

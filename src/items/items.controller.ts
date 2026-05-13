@@ -20,11 +20,11 @@ export class ItemsController {
   findAll() {
     return this.itemsService.findAll();
   }
-  // @Get('health')
-  // @ApiOperation({ summary: 'Estado del servicio' })
-  // getHealth() {
-  //   return { status: 'ok',version: '1.0'};
-  // }
+  @Get('health')
+  @ApiOperation({ summary: 'Estado del servicio' })
+  getHealth() {
+    return { status: 'ok',version: '1.0'};
+  }
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener un item por ID' })
