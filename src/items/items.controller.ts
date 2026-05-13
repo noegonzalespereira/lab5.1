@@ -20,16 +20,19 @@ export class ItemsController {
   findAll() {
     return this.itemsService.findAll();
   }
+  // Ponlo ANTES del @Get(':id')
+  @Get('health')
+  @ApiOperation({ summary: 'Estado del servicio' })
+  getHealth() {
+    return { status: 'ok' };
+  }
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener un item por ID' })
   findOne(@Param('id') id: string) {
     return this.itemsService.findOne(+id);
   }
-  @Get('health')
-  getHealth() {
-    return { status: 'ok' };
-  }
+ 
 
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar un item' })
