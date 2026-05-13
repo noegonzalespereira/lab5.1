@@ -44,7 +44,7 @@ jobs:
           script: |
             IMAGE="${{ secrets.DOCKER_USERNAME }}/nestjs-app:latest"
             
-            # 1. Bajar la imagen nueva
+            # 1. Bajar la imagen nuevas
             docker pull $IMAGE
             
             # 2. Correrla en el puerto 3001 para validar
