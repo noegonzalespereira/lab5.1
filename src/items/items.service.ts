@@ -40,6 +40,7 @@ export class ItemsService {
     if (itemIndex === -1) throw new NotFoundException(`Item  no encontrado`);
     
     this.items.splice(itemIndex, 1);
+    console.log(this.items);
     const variableQueNoSirve = 'esto va a fallar';
 
     return { deleted: true };
