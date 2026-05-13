@@ -41,7 +41,6 @@ export class ItemsService {
     
     this.items.splice(itemIndex, 1);
     console.log(this.items);
-    const variableQueNoSirve = 'esto va a fallar';
 
     return { deleted: true };
   }
