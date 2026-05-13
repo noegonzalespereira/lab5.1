@@ -51,7 +51,7 @@ jobs:
             docker run -d --name nest-app-new -p 3001:3000 $IMAGE
             
             # 3. Esperar a que NestJS eche a andar
-            sleep 10
+            sleep 20
             
             # 4. Health check (validamos contra Swagger /api)
             if curl -sf http://localhost:3001/api; then
