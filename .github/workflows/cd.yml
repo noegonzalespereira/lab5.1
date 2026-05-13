@@ -48,7 +48,7 @@ jobs:
             docker pull $IMAGE
             
             # 2. Correrla en el puerto 3001 para validar
-            docker run -d --name nest-app-new -p 3001:3000 $IMAGE
+            docker run -d --name nest-app-new -p 3001:3001 $IMAGE
             
             # 3. Esperar a que NestJS eche a andar
             sleep 20
@@ -60,7 +60,7 @@ jobs:
               docker rm nest-app || true
               
               # 5. Desplegar en el puerto 80 (el que abrimos en AWS)
-              docker run -d --name nest-app --restart unless-stopped -p 80:3000 $IMAGE
+              docker run -d --name nest-app --restart unless-stopped -p 80:3001 $IMAGE
               docker rm -f nest-app-new || true
             else
               echo "Health check FALLIDO. Manteniendo versión anterior."
